@@ -18,6 +18,10 @@ def create_app(test_config=None):
     from .models import db, Ticket
     db.init_app(app)
 
+    from flask_alembic import Alembic
+    alembic = Alembic()
+    alembic.init_app(app)
+
     from sqlalchemy.orm import exc
 
     @app.errorhandler(404)
