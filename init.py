@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, abort, redirect, render_template, url_for
 
 
 def create_app(test_config=None):
@@ -15,8 +15,14 @@ def create_app(test_config=None):
     else:
         app.config.from_mapping(test_config)
     
-    from .models import db
+    from .models import db, Ticket
     db.init_app(app)
+
+    from sqlalchemy.orm import exc
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('404.html'), 404
 
     @app.route('/')
     def index():
@@ -24,10 +30,15 @@ def create_app(test_config=None):
 
     @app.route('/tickets')
     def tickets():
-        return render_template('tickets_index.html')
+        tickets = Ticket.query.all()
+        return render_template('tickets_index.html', tickets=tickets)
     
     @app.route('/tickets/<int:ticket_id>')
     def tickets_show(ticket_id):
-        return render_template('tickets_show.html')
-    
+        try:
+            ticket = Ticket.query.filter_by(id=ticket_id).one()
+            return render_template('tickets_show.html', ticket=ticket)
+        except exc.NoResultFound:
+            abort(404)
+
     return app
