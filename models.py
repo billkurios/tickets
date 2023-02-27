@@ -8,6 +8,7 @@ class Ticket(db.Model):
     name = db.Column(db.String(100), nullable=False)
     status = db.Column(db.Integer, nullable=False)
     url = db.Column(db.String(100), nullable=True)
+    rating = db.Column(db.Integer, nullable=True)
 
     statuses_dict = {
         0: 'Reported',
@@ -27,5 +28,6 @@ class Ticket(db.Model):
             'id': self.id,
             'name': self.name,
             'status': self.status_string(),
-            'url': self.url
+            'url': self.url,
+            'rating': self.rating,
         }
